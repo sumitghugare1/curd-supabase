@@ -14,7 +14,7 @@ export default function EditPostForm({ post }) {
           id="title"
           name="title"
           type="text"
-          defaultValue={post.title} // Use defaultValue for forms managed by actions
+          defaultValue={post.title} 
           style={{ width: '100%', padding: '8px' }}
           required
         />

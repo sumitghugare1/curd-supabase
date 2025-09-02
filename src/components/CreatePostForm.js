@@ -7,7 +7,7 @@ export default function CreatePostForm() {
     // The form now directly calls the Server Action.
     <form action={createPostAction}>
       <input
-        name="title" // The 'name' attribute is important for FormData
+        name="title" 
         type="text"
         placeholder="New post title..."
         style={{ padding: '8px', width: '70%' }}

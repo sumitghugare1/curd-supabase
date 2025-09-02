@@ -1,5 +1,5 @@
 import Link from 'next/link';
-// ✅ Import the function from your new database service
+
 import { getPostById } from '@/services/db';
 
 // This function now uses the service to get data for the post's title
@@ -18,7 +18,7 @@ export async function generateMetadata({ params }) {
   };
 }
 
-// This is the page component, also using the service
+
 export default async function PostDetailPage({ params }) {
   const post = await getPostById(params.id);
 
