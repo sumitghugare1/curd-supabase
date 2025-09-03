@@ -29,20 +29,19 @@ export default async function PostDetailPage({ params }) {
   const post = await getPostById(params.id);
 
   if (!post) {
-    // This will be caught by the notFound() mechanism if you implement it,
-    // or simply render this paragraph.
     return <p>Post not found.</p>;
   }
 
-  // --- Create the Structured Data Schema ---
+  const schemas = [];
+
+  // --- Create BlogPosting Schema (already dynamic) ---
   const postSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     "headline": post.title,
-    // Add a description using the post's content
     "description": post.content ? post.content.substring(0, 155) + '...' : `Read the post titled: ${post.title}`,
     "datePublished": post.created_at,
-    "dateModified": post.created_at, // Use a last_updated field if you have one
+    "dateModified": post.created_at,
     "author": {
       "@type": "Organization",
       "name": "supabase curd app"
@@ -52,26 +51,83 @@ export default async function PostDetailPage({ params }) {
         "name": "supabase curd app",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://curd-supabase.vercel.app/logo.png" // Ensure this logo exists
+          "url": "https://curd-supabase.vercel.app/logo.png"
         }
     },
     "mainEntityOfPage": {
         "@type": "WebPage",
         "@id": `https://curd-supabase.vercel.app/posts/${post.id}`
     },
-    // Adding an image is highly recommended for rich results
     "image": {
         "@type": "ImageObject",
-        "url": "https://curd-supabase.vercel.app/default-post-image.png", // Use a relevant image for the post if available
+        "url": "https://curd-supabase.vercel.app/default-post-image.png",
         "height": 800,
         "width": 1200
     }
   };
+  schemas.push(postSchema);
+  
+  // --- Create Breadcrumb Schema (already dynamic) ---
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [{
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://curd-supabase.vercel.app/"
+    },{
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Posts",
+      "item": "https://curd-supabase.vercel.app/"
+    },{
+      "@type": "ListItem",
+      "position": 3,
+      "name": post.title,
+      "item": `https://curd-supabase.vercel.app/posts/${post.id}`
+    }]
+  };
+  schemas.push(breadcrumbSchema);
+
+  // --- Create Q&A Schema from Dynamic Data (if it exists) ---
+  if (post.qa_question && post.qa_answer) {
+    const qaSchema = {
+      "@context": "https://schema.org",
+      "@type": "QAPage",
+      "mainEntity": {
+        "@type": "Question",
+        "name": post.qa_question,
+        "answerCount": 1,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": post.qa_answer
+        }
+      }
+    };
+    schemas.push(qaSchema);
+  }
+
+  // --- Create Video Schema from Dynamic Data (if it exists) ---
+  if (post.video_url && post.video_name) {
+    const videoSchema = {
+      "@context": "https://schema.org",
+      "@type": "VideoObject",
+      "name": post.video_name,
+      "description": post.video_description || `A video about ${post.title}`,
+      "thumbnailUrl": "https://curd-supabase.vercel.app/default-post-image.png",
+      "uploadDate": post.created_at, // Or a dedicated video upload date field
+      "embedUrl": post.video_url
+    };
+    schemas.push(videoSchema);
+  }
 
   return (
     <main style={{ maxWidth: '600px', margin: 'auto', padding: '20px' }}>
-      {/* This script tag injects the structured data into the page */}
-      <JsonLd data={postSchema} />
+      {/* Inject all relevant schemas into the page */}
+      {schemas.map((schema, index) => (
+        <JsonLd key={index} data={schema} />
+      ))}
 
       <Link href="/">&larr; Back to all posts</Link>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -84,6 +140,31 @@ export default async function PostDetailPage({ params }) {
       <div style={{ marginTop: '30px' }}>
         <p>{post.content || "This post doesn't have content yet."}</p>
       </div>
+
+      {/* Dynamically render Video Section */}
+      {post.video_url && (
+        <div style={{ marginTop: '40px' }}>
+          <h2>{post.video_name || 'Related Video'}</h2>
+          <iframe 
+            width="560" 
+            height="315" 
+            src={post.video_url}
+            title={post.video_name || 'YouTube video player'}
+            frameBorder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowFullScreen>
+          </iframe>
+        </div>
+      )}
+
+      {/* Dynamically render Q&A Section */}
+      {post.qa_question && (
+        <div style={{ marginTop: '40px' }}>
+          <h2>Q&A</h2>
+          <h3>{post.qa_question}</h3>
+          <p>{post.qa_answer}</p>
+        </div>
+      )}
     </main>
   );
 }

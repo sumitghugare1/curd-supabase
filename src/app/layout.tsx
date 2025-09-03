@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import JsonLd from '@/components/JsonLd';
+import { getOrganizationSettings } from "@/services/db";
+import Navbar from "@/components/Navbar"; 
 
 
 export const metadata = {
@@ -33,11 +35,25 @@ const geistMono = Geist_Mono({
 });
 
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch the organization settings dynamically
+  const orgSettings = await getOrganizationSettings();
+
+  // Create the schema from the fetched data
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": orgSettings.name,
+    "url": orgSettings.url,
+    "logo": orgSettings.logo,
+  };
+
+
+
   return (
     <html lang="en">
       <head>
@@ -46,6 +62,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Navbar />
         {children}
       </body>
     </html>
