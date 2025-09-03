@@ -1,10 +1,12 @@
-import { getAllPosts } from '@/services/db';
+import { getAllPosts, getAllActiveFaqs, getLocalBusinessSettings } from '@/services/db';
 import CreatePostForm from '@/components/CreatePostForm'
 import PostItem from '@/components/PostItem';
 import JsonLd from '@/components/JsonLd';
 
 export default async function HomePage() {
     const posts = await getAllPosts();
+     const faqs = await getAllActiveFaqs();
+     const businessSettings = await getLocalBusinessSettings();
 
     // --- Create Carousel Schema ---
     const carouselSchema = {
@@ -18,44 +20,38 @@ export default async function HomePage() {
       }))
     };
 
-    // --- Create FAQ Schema ---
+    // --- Create FAQ Schema from Dynamic Data ---
     const faqSchema = {
       "@context": "https://schema.org",
       "@type": "FAQPage",
-      "mainEntity": [{
+      "mainEntity": faqs.map(faq => ({
         "@type": "Question",
-        "name": "What is this app for?",
+        "name": faq.question,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "This is a simple CRUD (Create, Read, Update, Delete) application built with Next.js and Supabase, designed to demonstrate modern web development practices."
+          "text": faq.answer
         }
-      },{
-        "@type": "Question",
-        "name": "How do I create a new post?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Simply type a title into the input box on the homepage and click the 'Add Post' button. Your new post will appear in the list below."
-        }
-      }]
+      }))
     };
 
-    // --- Create Local Business Schema ---
+    // --- Create Local Business Schema from Dynamic Data ---
     const localBusinessSchema = {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
-      "name": "Supabase Curd App Services",
+      "name": businessSettings.name,
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "123 Supabase Way",
-        "addressLocality": "San Francisco",
-        "addressRegion": "CA",
-        "postalCode": "94107",
-        "addressCountry": "US"
+        "streetAddress": businessSettings.streetAddress,
+        "addressLocality": businessSettings.addressLocality,
+        "addressRegion": businessSettings.addressRegion,
+        "postalCode": businessSettings.postalCode,
+        "addressCountry": "US" // Can also be made dynamic if needed
       },
       "image": "https://curd-supabase.vercel.app/logo.png",
-      "telephone": "+1-555-555-5555",
-      "priceRange": "$$"
+      "telephone": businessSettings.telephone,
+      "priceRange": businessSettings.priceRange
     };
+
 
 
   return (
@@ -77,16 +73,15 @@ export default async function HomePage() {
         ))}
       </div>
 
+       {/* --- Dynamic FAQ Section --- */}
       <div style={{ marginTop: '40px' }}>
         <h2>Frequently Asked Questions</h2>
-        <div>
-          <h3>What is this app for?</h3>
-          <p>This is a simple CRUD application built with Next.js and Supabase.</p>
-        </div>
-        <div style={{ marginTop: '20px' }}>
-          <h3>How do I create a post?</h3>
-          <p>Simply type a title in the input box on the homepage and click 'Add Post'.</p>
-        </div>
+        {faqs.map(faq => (
+            <div key={faq.id} style={{ marginTop: '20px' }}>
+                <h3>{faq.question}</h3>
+                <p>{faq.answer}</p>
+            </div>
+        ))}
       </div>
     </main>
   );

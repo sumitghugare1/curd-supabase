@@ -1,43 +1,54 @@
+import { getAllProducts } from '@/services/db';
 import JsonLd from '@/components/JsonLd';
 import Link from 'next/link';
 
-// This is the main page component for the product page
-export default function ProductPage() {
+// This page will now display the latest product added
+export default async function ProductPage() {
+  const products = await getAllProducts();
+  const latestProduct = products[0];
 
-  // --- Create the Product Schema ---
+  if (!latestProduct) {
+    return (
+        <main style={{ maxWidth: '600px', margin: 'auto', padding: '20px' }}>
+            <h1>Products</h1>
+            <p>No products are currently available.</p>
+        </main>
+    );
+  }
+
+  // --- Create the Product Schema from Dynamic Data ---
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": "Supabase T-Shirt",
+    "name": latestProduct.name,
     "image": [
-      "https://curd-supabase.vercel.app/default-post-image.png"
+      latestProduct.image_url || "https://curd-supabase.vercel.app/default-post-image.png"
      ],
-    "description": "A high-quality, comfortable t-shirt for developers who love Supabase.",
-    "sku": "Supa-T-01",
+    "description": latestProduct.description,
+    "sku": latestProduct.sku,
     "brand": {
       "@type": "Brand",
-      "name": "Supabase"
+      "name": latestProduct.brand_name || "supabase curd app"
     },
     "offers": {
       "@type": "Offer",
       "url": "https://curd-supabase.vercel.app/product",
       "priceCurrency": "USD",
-      "price": "25.00",
-      "availability": "https://schema.org/InStock",
+      "price": latestProduct.price,
+      "availability": `https://schema.org/${latestProduct.availability}`,
       "itemCondition": "https://schema.org/NewCondition"
     }
   };
 
   return (
     <main style={{ maxWidth: '600px', margin: 'auto', padding: '20px' }}>
-      {/* This script tag injects the structured data into the page */}
       <JsonLd data={productSchema} />
 
       <Link href="/">&larr; Back to home</Link>
-      <h1 style={{ marginTop: '20px' }}>Supabase T-Shirt</h1>
-      <img src="https://curd-supabase.vercel.app/default-post-image.png" alt="Product Image" style={{width: '100%', marginTop: '20px'}}/>
-      <p style={{ marginTop: '20px', fontSize: '24px', fontWeight: 'bold' }}>$25.00</p>
-      <p style={{ marginTop: '10px' }}>Show your support for Supabase with this comfortable and stylish t-shirt. Perfect for conferences, meetups, or coding sessions.</p>
+      <h1 style={{ marginTop: '20px' }}>{latestProduct.name}</h1>
+      <img src={latestProduct.image_url || "https://curd-supabase.vercel.app/default-post-image.png"} alt="Product Image" style={{width: '100%', marginTop: '20px'}}/>
+      <p style={{ marginTop: '20px', fontSize: '24px', fontWeight: 'bold' }}>${latestProduct.price}</p>
+      <p style={{ marginTop: '10px' }}>{latestProduct.description}</p>
       <button style={{ marginTop: '20px', padding: '10px', background: 'green', color: 'white' }}>Add to Cart</button>
     </main>
   );
