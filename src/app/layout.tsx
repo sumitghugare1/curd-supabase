@@ -6,8 +6,8 @@ import JsonLd from '@/components/JsonLd';
 
 export const metadata = {
   title: {
-    template: '%s | Company Name', 
-    default: 'supabase curd app | A supabase app', 
+    template: '%s | Company Name',
+    default: 'supabase curd app | A supabase app',
   },
   description: 'this is a simple curd app.',
 };
@@ -18,7 +18,7 @@ const organizationSchema = {
   "@type": "Organization",
   "name": "supabase curd app",
   "url": "https://curd-supabase.vercel.app/",
-  "logo": "https://curd-supabase.vercel.app/logo.png", 
+  "logo": "https://curd-supabase.vercel.app/logo.png",
 };
 
 
@@ -40,6 +40,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <JsonLd data={organizationSchema} />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
