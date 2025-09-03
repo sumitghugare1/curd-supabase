@@ -9,7 +9,7 @@ export default function PostItem({ post }) {
 
   return (
     <div style={{ border: '1px solid #ccc', padding: '10px', margin: '10px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <Link href={`/posts/${post.id}`} style={{ textDecoration: 'none', color: 'white' }}>
+      <Link href={`/posts/${post.id}`} style={{ textDecoration: 'none', color: 'yellow' }}>
         <p>{post.title}</p>
       </Link>
       <form action={deleteActionWithId}>
