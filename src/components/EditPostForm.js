@@ -3,7 +3,6 @@
 import { updatePostAction } from '@/services/server/posts';
 
 export default function EditPostForm({ post }) {
-  // Bind the post.id to the update action.
   const updateActionWithId = updatePostAction.bind(null, post.id);
 
   return (
@@ -17,6 +16,31 @@ export default function EditPostForm({ post }) {
       <div>
         <label htmlFor="content">Content</label>
         <textarea id="content" name="content" defaultValue={post.content || ''} rows={5} style={{ width: '100%', padding: '8px' }} />
+      </div>
+
+      <hr/>
+
+      {/* --- SEO Settings Section (This is the new part) --- */}
+      <h3>SEO Settings</h3>
+      <div>
+          <label htmlFor="meta_title">Meta Title</label>
+          <input id="meta_title" name="meta_title" type="text" defaultValue={post.meta_title || ''} style={{ width: '100%', padding: '8px' }} />
+      </div>
+       <div>
+          <label htmlFor="meta_description">Meta Description</label>
+          <textarea id="meta_description" name="meta_description" defaultValue={post.meta_description || ''} rows={3} style={{ width: '100%', padding: '8px' }} />
+      </div>
+      <div>
+          <label htmlFor="meta_keywords">Meta Keywords (comma-separated)</label>
+          <input id="meta_keywords" name="meta_keywords" type="text" defaultValue={post.meta_keywords || ''} style={{ width: '100%', padding: '8px' }} />
+      </div>
+       <div>
+          <label htmlFor="canonical_url">Canonical URL</label>
+          <input id="canonical_url" name="canonical_url" type="url" defaultValue={post.canonical_url || ''} style={{ width: '100%', padding: '8px' }} />
+      </div>
+      <div>
+          <label htmlFor="og_image_url">Open Graph Image URL</label>
+          <input id="og_image_url" name="og_image_url" type="url" defaultValue={post.og_image_url || ''} style={{ width: '100%', padding: '8px' }} />
       </div>
 
       <hr/>

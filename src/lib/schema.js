@@ -16,6 +16,11 @@ export const POST_FIELDS = {
   VIDEO_DESCRIPTION: 'video_description',
   QA_QUESTION: 'qa_question',
   QA_ANSWER: 'qa_answer',
+  META_TITLE: 'meta_title',
+  META_DESCRIPTION: 'meta_description',
+  META_KEYWORDS: 'meta_keywords',
+  CANONICAL_URL: 'canonical_url',
+  OG_IMAGE_URL: 'og_image_url',
 };
 
 export const EVENT_FIELDS = {

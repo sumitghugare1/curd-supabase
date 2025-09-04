@@ -26,6 +26,11 @@ export async function updatePostAction(id, formData) {
     [POST_FIELDS.VIDEO_DESCRIPTION]: formData.get('video_description'),
     [POST_FIELDS.QA_QUESTION]: formData.get('qa_question'),
     [POST_FIELDS.QA_ANSWER]: formData.get('qa_answer'),
+     [POST_FIELDS.META_TITLE]: formData.get('meta_title'),
+    [POST_FIELDS.META_DESCRIPTION]: formData.get('meta_description'),
+    [POST_FIELDS.META_KEYWORDS]: formData.get('meta_keywords'),
+    [POST_FIELDS.CANONICAL_URL]: formData.get('canonical_url'),
+    [POST_FIELDS.OG_IMAGE_URL]: formData.get('og_image_url'),
   };
   await updatePost(id, postData);
   revalidatePath('/');

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { getPostById } from '@/services/db';
 import JsonLd from '@/components/JsonLd';
 
-// This function generates the page's standard metadata (for the <head> tag)
+// This function now generates rich, dynamic metadata for each post
 export async function generateMetadata({ params }) {
   const post = await getPostById(params.id);
 
@@ -12,14 +12,36 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  // Create a short description for the metadata
-  const description = post.content
-    ? post.content.substring(0, 155) + '...'
-    : `Read the post titled: ${post.title}`;
+  const pageUrl = `https://curd-supabase.vercel.app/posts/${post.id}`;
 
   return {
-    title: `${post.title} | My Blog`,
-    description: description,
+    title: post.meta_title || post.title,
+    description: post.meta_description || (post.content ? post.content.substring(0, 155) : ''),
+    keywords: post.meta_keywords ? post.meta_keywords.split(',').map(k => k.trim()) : [],
+    alternates: {
+      canonical: post.canonical_url || pageUrl,
+    },
+    openGraph: {
+      title: post.meta_title || post.title,
+      description: post.meta_description || '',
+      url: pageUrl,
+      siteName: 'Supabase Curd App',
+      images: [
+        {
+          url: post.og_image_url || 'https://curd-supabase.vercel.app/default-post-image.png',
+          width: 1200,
+          height: 630,
+        },
+      ],
+      locale: 'en_US',
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.meta_title || post.title,
+      description: post.meta_description || '',
+      images: [post.og_image_url || 'https://curd-supabase.vercel.app/default-post-image.png'],
+    },
   };
 }
 
@@ -116,7 +138,7 @@ export default async function PostDetailPage({ params }) {
       "name": post.video_name,
       "description": post.video_description || `A video about ${post.title}`,
       "thumbnailUrl": "https://curd-supabase.vercel.app/default-post-image.png",
-      "uploadDate": post.created_at, // Or a dedicated video upload date field
+      "uploadDate": post.created_at,
       "embedUrl": post.video_url
     };
     schemas.push(videoSchema);
